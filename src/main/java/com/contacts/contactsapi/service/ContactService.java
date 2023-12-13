@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.contacts.contactsapi.domain.Contact;
 import com.contacts.contactsapi.repo.ContactRepo;
@@ -31,6 +32,29 @@ public class ContactService {
     public Contact createContact(Contact contact){
         return contactRepo.save(contact);
 
+    }
+    public void deleteContact(Contact contact){
+        contactRepo.delete(contact);
+
+    }
+    public String uploadPhoto(String id, MultipartFile file){
+        Contact contact = getContact(id);
+        String photurl= null;
+        contact.setPhotoUrl(photurl);
+        contactRepo.save(contact);
+        return photurl;
+    }
+    private final BiFunction<String, MultipartFile, String> photFunction=(id, image)->{
+        try{
+          Path fileStorageLocation= Paths.get("").toAbsolutePath.normalize();
+          if(!Files.exists(fileStorageLocation)){
+            Files.createDirectory(fileStorageLocation);
+        }
+        Files.copy(image.getInputStream(), fileStorageLocation.resolve(id+""), REPLACE_EXISTING);
+
+        }catch(Exception e){
+            throw new  RuntimeException("unable to save image");
+        }
     }
 
 }
